@@ -50,3 +50,4 @@ $RECYCLE.BIN/
 *.lnk
 words
 words.txt
+.idea/workspace.xml
