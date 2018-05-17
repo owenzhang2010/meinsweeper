@@ -2,6 +2,8 @@ import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
+import javafx.scene.control.Menu;
+import javafx.scene.control.MenuBar;
 import javafx.scene.layout.GridPane;
 import javafx.scene.Node;
 import javafx.scene.image.Image;
@@ -9,6 +11,11 @@ import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.stage.Stage;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
+// import org.json.JSONParser;
+// import org.json.ParseException;
 /* import javafx.event.ActionEvent;    // unused imports
 import javafx.event.EventHandler;
 import javafx.scene.control.Button;
@@ -47,6 +54,9 @@ public class Launcher extends Application {
         flagged = new boolean[BOARD_HEIGHT][BOARD_WIDTH];
         questioned = new boolean[BOARD_HEIGHT][BOARD_WIDTH];
         numRemainingTiles = BOARD_HEIGHT * BOARD_WIDTH - NUM_MINES;
+
+        // MenuBar mb = new MenuBar();
+
 
         fillWithBlanks(grid);
         placeMines();
