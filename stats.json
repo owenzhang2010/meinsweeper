@@ -1,0 +1,20 @@
+{
+  "beginner": {
+    "average": 0.0,
+    "best": 0.0,
+    "wins": 0,
+    "played": 0
+  },
+  "intermediate": {
+    "average": 0.0,
+    "best": 0.0,
+    "wins": 0,
+    "played": 0
+  },
+  "expert": {
+    "average": 0.0,
+    "best": 0.0,
+    "wins": 0,
+    "played": 0
+  }
+}
