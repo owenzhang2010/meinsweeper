@@ -11,11 +11,6 @@ import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.stage.Stage;
-
-import org.json.JSONArray;
-import org.json.JSONObject;
-// import org.json.JSONParser;
-// import org.json.ParseException;
 /* import javafx.event.ActionEvent;    // unused imports
 import javafx.event.EventHandler;
 import javafx.scene.control.Button;

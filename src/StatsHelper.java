@@ -4,7 +4,7 @@ public class StatsHelper {
     }
 
     public static void setDifficulty() {
-
+        return;
     }
 
     public static void winGame() { // update all stats for gamemode
