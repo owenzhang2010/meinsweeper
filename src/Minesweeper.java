@@ -1,9 +1,12 @@
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
+import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
+import javafx.scene.control.MenuItem;
+import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.Node;
 import javafx.scene.image.Image;
@@ -13,7 +16,6 @@ import javafx.scene.input.MouseEvent;
 import javafx.stage.Stage;
 /* import javafx.event.ActionEvent;    // unused imports
 import javafx.event.EventHandler;
-import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.geometry.Insets; */
@@ -24,8 +26,9 @@ public class Minesweeper extends Application {
     private Stage window;
     private boolean[][] mined, uncovered, flagged, questioned;
     private int numRemainingTiles;
+    private BorderPane container;
     private GridPane grid;
-    private static final int NUM_MINES = 150, BOARD_HEIGHT = 25, BOARD_WIDTH = 30;
+    private static final int NUM_MINES = 40, BOARD_HEIGHT = 16, BOARD_WIDTH = 16;
 
     public static void main(String[] args) {
         launch();
@@ -42,7 +45,9 @@ public class Minesweeper extends Application {
 
     private void initialize() {
         validateSettings();
+        StatsHelper.xmlSetup();
 
+        container = new BorderPane();
         grid = new GridPane();
         mined = new boolean[BOARD_HEIGHT][BOARD_WIDTH];
         uncovered = new boolean[BOARD_HEIGHT][BOARD_WIDTH];
@@ -52,19 +57,46 @@ public class Minesweeper extends Application {
 
         // MenuBar mb = new MenuBar();
 
-
-        fillWithBlanks(grid);
+        initializeMenu();
+        fillGridWithBlanks();
         placeMines();
 
         window.setWidth(32 * BOARD_WIDTH);
-        window.setHeight(32 * BOARD_HEIGHT + 22); // 22 is for the title bar/whatever you call it
+        window.setHeight(32 * BOARD_HEIGHT + 51); // 51 is for the title bar/whatever you call it
         window.setResizable(false);
-        Scene scene = new Scene(grid, 300, 200);
+        Scene scene = new Scene(container, 300, 200);
         window.setScene(scene);
         window.show();
     }
 
-    private void fillWithBlanks(GridPane grid) {
+    private void initializeMenu() {
+        MenuBar mb = new MenuBar();
+        Menu gameMenu = new Menu("Game");
+        Menu settingsMenu = new Menu("Settings");
+        Menu statsMenu = new Menu("Stats");
+
+        MenuItem newGame = new MenuItem("New");
+        newGame.addEventHandler(MouseEvent.MOUSE_CLICKED, e -> {
+            e.consume();
+            restart();
+        });
+        MenuItem exit = new MenuItem("Exit");
+        exit.addEventHandler(MouseEvent.MOUSE_CLICKED, e -> {
+            e.consume();
+            closeProgram();
+        });
+        gameMenu.getItems().addAll(newGame, exit);
+
+        MenuItem settings = new MenuItem("Settings");
+        settingsMenu.getItems().addAll(settings);
+
+        MenuItem stats = new MenuItem("Stats");
+        statsMenu.getItems().addAll(stats);
+        mb.getMenus().addAll(gameMenu, settingsMenu, statsMenu);
+        container.setTop(mb);
+    }
+
+    private void fillGridWithBlanks() {
         for (int r = 0; r < BOARD_HEIGHT; r++) {
             for (int c = 0; c < BOARD_WIDTH; c++) {
                 Image image = new Image("File:assets/32px-Minesweeper_unopened_square.svg.png");
@@ -84,6 +116,7 @@ public class Minesweeper extends Application {
                 grid.getChildren().add(iv);
             }
         }
+        container.setCenter(grid);
     }
 
     private void validateSettings() {

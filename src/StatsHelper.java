@@ -11,7 +11,6 @@ import javax.xml.transform.stream.StreamResult;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-import org.w3c.dom.Node;
 
 public class StatsHelper {
     public static void xmlSetup() {
@@ -24,20 +23,10 @@ public class StatsHelper {
                 Element rootElement = doc.createElement("stats");
                 doc.appendChild(rootElement);
 
-                Element browser = doc.createElement("BROWSER");
-                browser.appendChild(doc.createTextNode("chrome"));
-                rootElement.appendChild(browser);
-                Element base = doc.createElement("BASE");
-                base.appendChild(doc.createTextNode("http:fut"));
-                rootElement.appendChild(base);
-                Element employee = doc.createElement("EMPLOYEE");
-                rootElement.appendChild(employee);
-                Element empName = doc.createElement("EMP_NAME");
-                empName.appendChild(doc.createTextNode("Anhorn, Irene"));
-                employee.appendChild(empName);
-                Element actDate = doc.createElement("ACT_DATE");
-                actDate.appendChild(doc.createTextNode("20131201"));
-                employee.appendChild(actDate);
+                initializeStatsHelper(doc, rootElement, "beginner");
+                initializeStatsHelper(doc, rootElement, "intermediate");
+                initializeStatsHelper(doc, rootElement, "expert");
+                initializeStatsHelper(doc, rootElement, "lottery");
 
                 TransformerFactory transformerFactory = TransformerFactory.newInstance();
                 Transformer transformer = transformerFactory.newTransformer();
@@ -52,24 +41,21 @@ public class StatsHelper {
         }
     }
 
-    private void initializeStatsHelper(Document d, String difficulty) {
+    private static void initializeStatsHelper(Document d, Element root, String difficulty) {
         Element e = d.createElement(difficulty);
-        Element average = d.createElement("average");
-    }
-
-    public static String getDifficulty() {
-        return null;
-    }
-
-    public static void setDifficulty() {
-
+        e.setAttribute("average", "NaN");
+        e.setAttribute("best", "NaN");
+        e.setAttribute("wins", "0");
+        e.setAttribute("played", "0");
+        e.setAttribute("percentage", "NaN");
+        root.appendChild(e);
     }
 
     public static void winGame() { // update all stats for gamemode
 
     }
 
-    public static void loseGame() { // update played for gamemode
+    public static void loseGame() { // update played/% for gamemode
 
     }
 
