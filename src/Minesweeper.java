@@ -23,7 +23,7 @@ public class Minesweeper extends Application {
     private int numRemainingTiles;
     private BorderPane container;
     private GridPane grid;
-    private static final int NUM_MINES = 99, BOARD_HEIGHT = 24, BOARD_WIDTH = 24;
+    private static final int NUM_MINES = 99, BOARD_HEIGHT = 16, BOARD_WIDTH = 30;
 
     public static void main(String[] args) {
         launch();
