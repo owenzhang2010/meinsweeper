@@ -20,7 +20,7 @@ import javafx.geometry.Insets; */
 
 import java.util.Random;
 
-public class Launcher extends Application {
+public class Minesweeper extends Application {
     private Stage window;
     private boolean[][] mined, uncovered, flagged, questioned;
     private int numRemainingTiles;
