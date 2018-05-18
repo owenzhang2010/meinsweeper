@@ -1,7 +1,6 @@
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
-import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
@@ -14,21 +13,17 @@ import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.stage.Stage;
-/* import javafx.event.ActionEvent;    // unused imports
-import javafx.event.EventHandler;
-import javafx.scene.control.Label;
-import javafx.scene.control.TextField;
-import javafx.geometry.Insets; */
 
 import java.util.Random;
 
 public class Minesweeper extends Application {
     private Stage window;
     private boolean[][] mined, uncovered, flagged, questioned;
+    private int[] minedRows, minedCols;
     private int numRemainingTiles;
     private BorderPane container;
     private GridPane grid;
-    private static final int NUM_MINES = 40, BOARD_HEIGHT = 16, BOARD_WIDTH = 16;
+    private static final int NUM_MINES = 99, BOARD_HEIGHT = 24, BOARD_WIDTH = 24;
 
     public static void main(String[] args) {
         launch();
@@ -53,9 +48,9 @@ public class Minesweeper extends Application {
         uncovered = new boolean[BOARD_HEIGHT][BOARD_WIDTH];
         flagged = new boolean[BOARD_HEIGHT][BOARD_WIDTH];
         questioned = new boolean[BOARD_HEIGHT][BOARD_WIDTH];
+        minedRows = new int[NUM_MINES];
+        minedCols = new int[NUM_MINES];
         numRemainingTiles = BOARD_HEIGHT * BOARD_WIDTH - NUM_MINES;
-
-        // MenuBar mb = new MenuBar();
 
         initializeMenu();
         fillGridWithBlanks();
@@ -136,14 +131,16 @@ public class Minesweeper extends Application {
     }
 
     private void placeMines() {
-        int numMines = 0;
+        int i = 0;
         Random r = new Random();
-        while (numMines < NUM_MINES) {
+        while (i < NUM_MINES) {
             int row = r.nextInt(BOARD_HEIGHT);
             int col = r.nextInt(BOARD_WIDTH);
             if (!mined[row][col]) {
                 mined[row][col] = true;
-                numMines += 1;
+                minedRows[i] = row;
+                minedCols[i] = col;
+                i += 1;
             }
         }
     }
@@ -259,12 +256,11 @@ public class Minesweeper extends Application {
     }
 
     private void win() {
-        for (int r = 0; r < BOARD_HEIGHT; r++) {
-            for (int c = 0; c < BOARD_WIDTH; c++) {
-                if (mined[r][c]) {
-                    ImageView flag = getIVFromGridPane(r, c);
-                    flag.setImage(new Image("File:assets/32px-Minesweeper_flag.svg.png"));
-                }
+        for (int i = 0; i < NUM_MINES; i++) {
+            int r = minedRows[i], c = minedCols[i];
+            if (mined[r][c]) {
+                ImageView flag = getIVFromGridPane(r, c);
+                flag.setImage(new Image("File:assets/32px-Minesweeper_flag.svg.png"));
             }
         }
 
@@ -272,14 +268,13 @@ public class Minesweeper extends Application {
     }
 
     private void lose() {
-        for (int r = 0; r < BOARD_HEIGHT; r++) {
-            for (int c = 0; c < BOARD_WIDTH; c++) {
-                if (mined[r][c] && !flagged[r][c]) {
-                    ImageView mine = getIVFromGridPane(r, c);
-                    mine.setFitHeight(32);
-                    mine.setFitWidth(32);
-                    mine.setImage(new Image("File:assets/32px-Minesweeper_mine.png"));
-                }
+        for (int i = 0; i < NUM_MINES; i++) {
+            int r = minedRows[i], c = minedCols[i];
+            if (mined[r][c] && !flagged[r][c]) {
+                ImageView mine = getIVFromGridPane(r, c);
+                mine.setFitHeight(32);
+                mine.setFitWidth(32);
+                mine.setImage(new Image("File:assets/32px-Minesweeper_mine.png"));
             }
         }
         popup("u lose", "R I P Play again?");
