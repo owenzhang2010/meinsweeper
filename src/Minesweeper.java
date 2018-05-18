@@ -76,12 +76,12 @@ public class Minesweeper extends Application {
         Menu statsMenu = new Menu("Stats");
 
         MenuItem newGame = new MenuItem("New");
-        newGame.addEventHandler(MouseEvent.MOUSE_CLICKED, e -> {
+        newGame.setOnAction(e -> {
             e.consume();
             restart();
         });
         MenuItem exit = new MenuItem("Exit");
-        exit.addEventHandler(MouseEvent.MOUSE_CLICKED, e -> {
+        exit.setOnAction(e -> {
             e.consume();
             closeProgram();
         });
@@ -90,8 +90,18 @@ public class Minesweeper extends Application {
         MenuItem settings = new MenuItem("Settings");
         settingsMenu.getItems().addAll(settings);
 
-        MenuItem stats = new MenuItem("Stats");
-        statsMenu.getItems().addAll(stats);
+        MenuItem beginner = new MenuItem("Beginner");
+        beginner.setOnAction(e -> StatsHelper.showStats("beginner"));
+        MenuItem intermediate = new MenuItem("Intermediate");
+        intermediate.setOnAction(e -> StatsHelper.showStats("intermediate"));
+        MenuItem expert = new MenuItem("Expert");
+        expert.setOnAction(e -> StatsHelper.showStats("expert"));
+        MenuItem lottery = new MenuItem("Lottery");
+        lottery.setOnAction(e -> StatsHelper.showStats("lottery"));
+        MenuItem resetAll = new MenuItem("Reset All");
+        resetAll.setOnAction(e -> StatsHelper.resetAll());
+        statsMenu.getItems().addAll(beginner, intermediate, expert, lottery, resetAll);
+
         mb.getMenus().addAll(gameMenu, settingsMenu, statsMenu);
         container.setTop(mb);
     }

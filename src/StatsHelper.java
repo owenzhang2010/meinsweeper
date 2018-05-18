@@ -51,6 +51,10 @@ public class StatsHelper {
         root.appendChild(e);
     }
 
+    public static void showStats(String difficulty) {
+        
+    }
+
     public static void winGame() { // update all stats for gamemode
 
     }
