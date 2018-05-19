@@ -1,5 +1,6 @@
 import javafx.application.Application;
 import javafx.animation.AnimationTimer;
+import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
@@ -8,11 +9,13 @@ import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.HBox;
 import javafx.scene.Node;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
 import java.util.Random;
@@ -22,10 +25,13 @@ public class Minesweeper extends Application {
     private boolean[][] mined, uncovered, flagged, questioned;
     private int[] minedRows, minedCols;
     private int numRemainingTiles, numRemainingMines;
-    private BorderPane container;
+    private double elapsedTime, startNanos;
+    private BorderPane container, gameContainer;
     private GridPane grid;
     private AnimationTimer timer;
-    private static final int NUM_MINES = 99, BOARD_HEIGHT = 16, BOARD_WIDTH = 30;
+    private boolean gameInProgress;
+    private Text timerText, faceText, minesText;
+    private int numMines = 99, boardHeight = 16, boardWidth = 30;
 
     public static void main(String[] args) {
         launch();
@@ -45,28 +51,36 @@ public class Minesweeper extends Application {
         StatsHelper.xmlSetup();
 
         container = new BorderPane();
+        gameContainer = new BorderPane();
         grid = new GridPane();
+        mined = new boolean[boardHeight][boardWidth];
+        uncovered = new boolean[boardHeight][boardWidth];
+        flagged = new boolean[boardHeight][boardWidth];
+        questioned = new boolean[boardHeight][boardWidth];
+        minedRows = new int[numMines];
+        minedCols = new int[numMines];
+        numRemainingTiles = boardHeight * boardWidth - numMines;
+        numRemainingMines = numMines;
+        elapsedTime = 0;
         timer = new AnimationTimer() {
             @Override
             public void handle(long now) {
-
+                if (!gameInProgress) {
+                    startNanos = now;
+                } else {
+                    elapsedTime = (now - startNanos) / 1e9;
+                    timerText.setText(Integer.toString((int) elapsedTime));
+                }
             }
         };
-        mined = new boolean[BOARD_HEIGHT][BOARD_WIDTH];
-        uncovered = new boolean[BOARD_HEIGHT][BOARD_WIDTH];
-        flagged = new boolean[BOARD_HEIGHT][BOARD_WIDTH];
-        questioned = new boolean[BOARD_HEIGHT][BOARD_WIDTH];
-        minedRows = new int[NUM_MINES];
-        minedCols = new int[NUM_MINES];
-        numRemainingTiles = BOARD_HEIGHT * BOARD_WIDTH - NUM_MINES;
-        numRemainingMines = NUM_MINES;
 
         initializeMenu();
+        initializeGameHUD();
         fillGridWithBlanks();
         placeMines();
 
-        window.setWidth(32 * BOARD_WIDTH);
-        window.setHeight(32 * BOARD_HEIGHT + 51); // 51 is for the title bar/whatever you call it
+        window.setWidth(32 * boardWidth);
+        window.setHeight(32 * boardHeight + 67); // 67 is for the title bar/whatever you call it
         window.setResizable(false);
         Scene scene = new Scene(container, 300, 200);
         window.setScene(scene);
@@ -110,31 +124,51 @@ public class Minesweeper extends Application {
         container.setTop(mb);
     }
 
+    private void initializeGameHUD() {
+        HBox hud = new HBox();
+        hud.setPadding(new Insets(0, 15, 0, 15));
+        hud.setSpacing(boardWidth * 14.5);
+
+        timerText = new Text(Double.toString(elapsedTime));
+        faceText = new Text(":-)");
+        minesText = new Text(Integer.toString(numRemainingMines));
+        hud.getChildren().addAll(timerText, faceText, minesText);
+
+        gameContainer.setTop(hud);
+    }
+
     private void fillGridWithBlanks() {
-        for (int r = 0; r < BOARD_HEIGHT; r++) {
-            for (int c = 0; c < BOARD_WIDTH; c++) {
+        for (int r = 0; r < boardHeight; r++) {
+            for (int c = 0; c < boardWidth; c++) {
                 Image image = new Image("File:assets/32px-Minesweeper_unopened_square.svg.png");
                 ImageView iv = new ImageView(image);
                 iv.addEventHandler(MouseEvent.MOUSE_CLICKED, e -> {
                     ImageView tile = (ImageView) e.getSource();
                     MouseButton button = e.getButton();
                     e.consume();
+                    if (!gameInProgress) {
+                        timer.start();
+                        gameInProgress = true;
+                    }
                     if (button == MouseButton.PRIMARY) {
                         primaryClick(tile);
                     } else if (button == MouseButton.SECONDARY) {
                         secondaryClick(tile);
                     }
                 });
+                iv.addEventHandler(MouseEvent.MOUSE_PRESSED, e -> faceText.setText(":-O"));
+                iv.addEventHandler(MouseEvent.MOUSE_RELEASED, e -> faceText.setText(":-)"));
                 GridPane.setRowIndex(iv, r);
                 GridPane.setColumnIndex(iv, c);
                 grid.getChildren().add(iv);
             }
         }
-        container.setCenter(grid);
+        gameContainer.setCenter(grid);
+        container.setCenter(gameContainer);
     }
 
     private void validateSettings() {
-        if (BOARD_HEIGHT * BOARD_WIDTH <= NUM_MINES) {
+        if (boardHeight * boardWidth <= numMines) {
             throw new IllegalStateException("invalid game settings");
         }
     }
@@ -142,9 +176,9 @@ public class Minesweeper extends Application {
     private void placeMines() {
         int i = 0;
         Random r = new Random();
-        while (i < NUM_MINES) {
-            int row = r.nextInt(BOARD_HEIGHT);
-            int col = r.nextInt(BOARD_WIDTH);
+        while (i < numMines) {
+            int row = r.nextInt(boardHeight);
+            int col = r.nextInt(boardWidth);
             if (!mined[row][col]) {
                 mined[row][col] = true;
                 minedRows[i] = row;
@@ -204,12 +238,13 @@ public class Minesweeper extends Application {
             tile.setImage(new Image("File:assets/32px-Minesweeper_unopened_square.svg.png"));
             numRemainingMines += 1;
         }
+        minesText.setText(Integer.toString(numRemainingMines));
     }
 
     private int getNeighboringMines(int row, int col) {
         int mines = 0;
-        for (int r = Math.max(0, row - 1); r <= Math.min(BOARD_HEIGHT - 1, row + 1); r++) {
-            for (int c = Math.max(0, col - 1); c <= Math.min(BOARD_WIDTH - 1, col + 1); c++) {
+        for (int r = Math.max(0, row - 1); r <= Math.min(boardHeight - 1, row + 1); r++) {
+            for (int c = Math.max(0, col - 1); c <= Math.min(boardWidth - 1, col + 1); c++) {
                 if (!(row == r && col == c) && mined[r][c]) {
                     mines += 1;
                 }
@@ -220,8 +255,8 @@ public class Minesweeper extends Application {
 
     private int getNeighboringFlagged(int row, int col) {
         int flags = 0;
-        for (int r = Math.max(0, row - 1); r <= Math.min(BOARD_HEIGHT - 1, row + 1); r++) {
-            for (int c = Math.max(0, col - 1); c <= Math.min(BOARD_WIDTH - 1, col + 1); c++) {
+        for (int r = Math.max(0, row - 1); r <= Math.min(boardHeight - 1, row + 1); r++) {
+            for (int c = Math.max(0, col - 1); c <= Math.min(boardWidth - 1, col + 1); c++) {
                 if (!(row == r && col == c) && flagged[r][c]) {
                     flags += 1;
                 }
@@ -231,8 +266,8 @@ public class Minesweeper extends Application {
     }
 
     private void uncoverUnflaggedNeighbors(int row, int col) {
-        for (int r = Math.max(0, row - 1); r <= Math.min(BOARD_HEIGHT - 1, row + 1); r++) {
-            for (int c = Math.max(0, col - 1); c <= Math.min(BOARD_WIDTH - 1, col + 1); c++) {
+        for (int r = Math.max(0, row - 1); r <= Math.min(boardHeight - 1, row + 1); r++) {
+            for (int c = Math.max(0, col - 1); c <= Math.min(boardWidth - 1, col + 1); c++) {
                 if (!(row == r && col == c) && !flagged[r][c] && !uncovered[r][c]) {
                     ImageView neighbor = getIVFromGridPane(r, c);
                     uncoverTile(neighbor, r, c);
@@ -253,6 +288,7 @@ public class Minesweeper extends Application {
             tile.setImage(new Image("File:assets/32px-Minesweeper_flag.svg.png"));
             numRemainingMines -= 1;
         }
+        minesText.setText(Integer.toString(numRemainingMines));
     }
 
     private ImageView getIVFromGridPane(int row, int col) {
@@ -269,21 +305,28 @@ public class Minesweeper extends Application {
     }
 
     private void win() {
-        for (int i = 0; i < NUM_MINES; i++) {
+        gameInProgress = false;
+        timer.stop();
+        for (int i = 0; i < numMines; i++) {
             int r = minedRows[i], c = minedCols[i];
             ImageView flag = getIVFromGridPane(r, c);
+            assert flag != null;
             flag.setImage(new Image("File:assets/32px-Minesweeper_flag.svg.png"));
-            numRemainingMines -= 1;
         }
+        minesText.setText("0");
 
         popup("congrats", "You win! Play again?");
     }
 
     private void lose() {
-        for (int i = 0; i < NUM_MINES; i++) {
+        gameInProgress = false;
+        timer.stop();
+        faceText.setText("x_x");
+        for (int i = 0; i < numMines; i++) {
             int r = minedRows[i], c = minedCols[i];
             if (!flagged[r][c]) {
                 ImageView mine = getIVFromGridPane(r, c);
+                assert mine != null;
                 mine.setFitHeight(32);
                 mine.setFitWidth(32);
                 mine.setImage(new Image("File:assets/32px-Minesweeper_mine.png"));
