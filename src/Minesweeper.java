@@ -23,7 +23,6 @@ import java.util.Random;
 public class Minesweeper extends Application {
     private Stage window;
     private boolean[][] mined, uncovered, flagged, questioned;
-    private int[] minedRows, minedCols;
     private int numRemainingTiles, numRemainingMines;
     private double elapsedTime, startNanos;
     private BorderPane container, gameContainer;
@@ -57,8 +56,6 @@ public class Minesweeper extends Application {
         uncovered = new boolean[boardHeight][boardWidth];
         flagged = new boolean[boardHeight][boardWidth];
         questioned = new boolean[boardHeight][boardWidth];
-        minedRows = new int[numMines];
-        minedCols = new int[numMines];
         numRemainingTiles = boardHeight * boardWidth - numMines;
         numRemainingMines = numMines;
         elapsedTime = 0;
@@ -181,8 +178,6 @@ public class Minesweeper extends Application {
             int col = r.nextInt(boardWidth);
             if (!mined[row][col]) {
                 mined[row][col] = true;
-                minedRows[i] = row;
-                minedCols[i] = col;
                 i += 1;
             }
         }
@@ -307,11 +302,15 @@ public class Minesweeper extends Application {
     private void win() {
         gameInProgress = false;
         timer.stop();
-        for (int i = 0; i < numMines; i++) {
-            int r = minedRows[i], c = minedCols[i];
-            ImageView flag = getIVFromGridPane(r, c);
-            assert flag != null;
-            flag.setImage(new Image("File:assets/32px-Minesweeper_flag.svg.png"));
+        faceText.setText("B-)");
+        for (int r = 0; r < boardHeight; r++) {
+            for (int c = 0; c < boardWidth; c++) {
+                if (mined[r][c]) {
+                    ImageView flag = getIVFromGridPane(r, c);
+                    assert flag != null;
+                    flag.setImage(new Image("File:assets/32px-Minesweeper_flag.svg.png"));
+                }
+            }
         }
         minesText.setText("0");
 
@@ -322,14 +321,17 @@ public class Minesweeper extends Application {
         gameInProgress = false;
         timer.stop();
         faceText.setText("x_x");
-        for (int i = 0; i < numMines; i++) {
-            int r = minedRows[i], c = minedCols[i];
-            if (!flagged[r][c]) {
-                ImageView mine = getIVFromGridPane(r, c);
-                assert mine != null;
-                mine.setFitHeight(32);
-                mine.setFitWidth(32);
-                mine.setImage(new Image("File:assets/32px-Minesweeper_mine.png"));
+        for (int r = 0; r < boardHeight; r++) {
+            for (int c = 0; c < boardWidth; c++) {
+                if (mined[r][c] && !flagged[r][c]) {
+                    ImageView mine = getIVFromGridPane(r, c);
+                    assert mine != null;
+                    mine.setImage(new Image("File:assets/32px-Minesweeper_mine.jpg"));
+                } else if (!mined[r][c] && flagged[r][c]) {
+                    ImageView fake = getIVFromGridPane(r, c);
+                    assert fake != null;
+                    fake.setImage(new Image("File:assets/32px-Minesweeper_fake.png"));
+                }
             }
         }
         popup("u lose", "R I P Play again?");
