@@ -1,4 +1,5 @@
 import javafx.application.Application;
+import javafx.animation.AnimationTimer;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
@@ -20,9 +21,10 @@ public class Minesweeper extends Application {
     private Stage window;
     private boolean[][] mined, uncovered, flagged, questioned;
     private int[] minedRows, minedCols;
-    private int numRemainingTiles;
+    private int numRemainingTiles, numRemainingMines;
     private BorderPane container;
     private GridPane grid;
+    private AnimationTimer timer;
     private static final int NUM_MINES = 99, BOARD_HEIGHT = 16, BOARD_WIDTH = 30;
 
     public static void main(String[] args) {
@@ -44,6 +46,12 @@ public class Minesweeper extends Application {
 
         container = new BorderPane();
         grid = new GridPane();
+        timer = new AnimationTimer() {
+            @Override
+            public void handle(long now) {
+
+            }
+        };
         mined = new boolean[BOARD_HEIGHT][BOARD_WIDTH];
         uncovered = new boolean[BOARD_HEIGHT][BOARD_WIDTH];
         flagged = new boolean[BOARD_HEIGHT][BOARD_WIDTH];
@@ -51,6 +59,7 @@ public class Minesweeper extends Application {
         minedRows = new int[NUM_MINES];
         minedCols = new int[NUM_MINES];
         numRemainingTiles = BOARD_HEIGHT * BOARD_WIDTH - NUM_MINES;
+        numRemainingMines = NUM_MINES;
 
         initializeMenu();
         fillGridWithBlanks();
@@ -188,10 +197,12 @@ public class Minesweeper extends Application {
         if (!(flagged[row][col] || questioned[row][col])) {
             flagged[row][col] = true;
             tile.setImage(new Image("File:assets/32px-Minesweeper_flag.svg.png"));
+            numRemainingMines -= 1;
         } else {
             flagged[row][col] = false;
             questioned[row][col] = false;
             tile.setImage(new Image("File:assets/32px-Minesweeper_unopened_square.svg.png"));
+            numRemainingMines += 1;
         }
     }
 
@@ -235,10 +246,12 @@ public class Minesweeper extends Application {
             flagged[row][col] = false;
             questioned[row][col] = true;
             tile.setImage(new Image("File:assets/32px-Minesweeper_questionmark.svg.png"));
+            numRemainingMines += 1;
         } else {
             questioned[row][col] = false;
             flagged[row][col] = true;
             tile.setImage(new Image("File:assets/32px-Minesweeper_flag.svg.png"));
+            numRemainingMines -= 1;
         }
     }
 
@@ -258,10 +271,9 @@ public class Minesweeper extends Application {
     private void win() {
         for (int i = 0; i < NUM_MINES; i++) {
             int r = minedRows[i], c = minedCols[i];
-            if (mined[r][c]) {
-                ImageView flag = getIVFromGridPane(r, c);
-                flag.setImage(new Image("File:assets/32px-Minesweeper_flag.svg.png"));
-            }
+            ImageView flag = getIVFromGridPane(r, c);
+            flag.setImage(new Image("File:assets/32px-Minesweeper_flag.svg.png"));
+            numRemainingMines -= 1;
         }
 
         popup("congrats", "You win! Play again?");
@@ -270,7 +282,7 @@ public class Minesweeper extends Application {
     private void lose() {
         for (int i = 0; i < NUM_MINES; i++) {
             int r = minedRows[i], c = minedCols[i];
-            if (mined[r][c] && !flagged[r][c]) {
+            if (!flagged[r][c]) {
                 ImageView mine = getIVFromGridPane(r, c);
                 mine.setFitHeight(32);
                 mine.setFitWidth(32);

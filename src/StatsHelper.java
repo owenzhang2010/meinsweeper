@@ -62,23 +62,49 @@ public class StatsHelper {
             stats.put("best", e.getAttribute("best"));
             stats.put("wins", e.getAttribute("wins"));
             stats.put("played", e.getAttribute("played"));
-            stats.put("percentage: ", e.getAttribute("percentage"));
+            stats.put("percentage", e.getAttribute("percentage"));
             StatsBox.display(difficulty, stats);
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    public static void winGame() { // update all stats for game mode
-
+    public static void winGame(String difficulty) { // update all stats for game mode
+        File f = new File("stats.xml");
+        try {
+            document = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(f);
+            Element e = (Element) document.getElementsByTagName(difficulty).item(0);
+            int wins = Integer.valueOf(e.getAttribute("wins"));
+            int played = Integer.valueOf(e.getAttribute("played"));
+            wins += 1; played += 1;
+            double percentage = ((double) wins) / ((double) played);
+            e.setAttribute("wins", Integer.toString(wins));
+            e.setAttribute("played", Integer.toString(played));
+            e.setAttribute("percentage", Double.toString(percentage));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
-    public static void loseGame() { // update played/% for game mode
+    public static void loseGame(String difficulty) { // update played/% for game mode
 
     }
 
     public static void resetMode(String mode) {
-
+        File f = new File("stats.xml");
+        if (f.exists()) {
+            try {
+                document = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(f);
+                Element e = (Element) document.getElementsByTagName(mode).item(0);
+                e.setAttribute("average", "NaN");
+                e.setAttribute("best", "NaN");
+                e.setAttribute("wins", "0");
+                e.setAttribute("played", "0");
+                e.setAttribute("percentage", "NaN");
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     public static void resetAll() {

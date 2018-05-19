@@ -1,13 +1,10 @@
 import java.util.Map;
 
-import javafx.application.Application;
 import javafx.stage.Stage;
 import javafx.stage.Modality;
 import javafx.scene.text.Text;
-import javafx.scene.*;
-import javafx.scene.control.*;
-import javafx.scene.layout.*;
-
+import javafx.scene.Scene;
+import javafx.scene.layout.GridPane;
 
 public class StatsBox {
     public static void display(String difficulty, Map<String, String> stats) {
