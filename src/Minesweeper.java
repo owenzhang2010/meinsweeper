@@ -2,14 +2,8 @@ import javafx.application.Application;
 import javafx.animation.AnimationTimer;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
-import javafx.scene.control.Alert;
-import javafx.scene.control.ButtonType;
-import javafx.scene.control.Menu;
-import javafx.scene.control.MenuBar;
-import javafx.scene.control.MenuItem;
-import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.GridPane;
-import javafx.scene.layout.HBox;
+import javafx.scene.control.*;
+import javafx.scene.layout.*;
 import javafx.scene.Node;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -28,9 +22,8 @@ public class Minesweeper extends Application {
     private BorderPane container, gameContainer;
     private GridPane grid;
     private AnimationTimer timer;
-    private boolean gameInProgress;
     private Text timerText, faceText, minesText;
-    private int numMines = 99, boardHeight = 16, boardWidth = 30;
+    private int numMines = 40, boardHeight = 16, boardWidth = 16;
 
     public static void main(String[] args) {
         launch();
@@ -58,11 +51,11 @@ public class Minesweeper extends Application {
         questioned = new boolean[boardHeight][boardWidth];
         numRemainingTiles = boardHeight * boardWidth - numMines;
         numRemainingMines = numMines;
-        elapsedTime = 0;
+        elapsedTime = 0; startNanos = 0;
         timer = new AnimationTimer() {
             @Override
             public void handle(long now) {
-                if (!gameInProgress) {
+                if (startNanos == 0) {
                     startNanos = now;
                 } else {
                     elapsedTime = (now - startNanos) / 1e9;
@@ -122,14 +115,16 @@ public class Minesweeper extends Application {
     }
 
     private void initializeGameHUD() {
-        HBox hud = new HBox();
-        hud.setPadding(new Insets(0, 15, 0, 15));
-        hud.setSpacing(boardWidth * 14.5);
 
         timerText = new Text(Double.toString(elapsedTime));
         faceText = new Text(":-)");
         minesText = new Text(Integer.toString(numRemainingMines));
-        hud.getChildren().addAll(timerText, faceText, minesText);
+        Region region1 = new Region();
+        HBox.setHgrow(region1, Priority.ALWAYS);
+        Region region2 = new Region();
+        HBox.setHgrow(region2, Priority.ALWAYS);
+        HBox hud = new HBox(timerText, region1, faceText, region2, minesText);
+        hud.setPadding(new Insets(0, 15, 0, 15));
 
         gameContainer.setTop(hud);
     }
@@ -143,9 +138,8 @@ public class Minesweeper extends Application {
                     ImageView tile = (ImageView) e.getSource();
                     MouseButton button = e.getButton();
                     e.consume();
-                    if (!gameInProgress) {
+                    if (startNanos == 0) {
                         timer.start();
-                        gameInProgress = true;
                     }
                     if (button == MouseButton.PRIMARY) {
                         primaryClick(tile);
@@ -300,7 +294,6 @@ public class Minesweeper extends Application {
     }
 
     private void win() {
-        gameInProgress = false;
         timer.stop();
         faceText.setText("B-)");
         for (int r = 0; r < boardHeight; r++) {
@@ -318,7 +311,6 @@ public class Minesweeper extends Application {
     }
 
     private void lose() {
-        gameInProgress = false;
         timer.stop();
         faceText.setText("x_x");
         for (int r = 0; r < boardHeight; r++) {

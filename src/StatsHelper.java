@@ -13,23 +13,21 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 public class StatsHelper {
-    private static Document document;
-
     public static void xmlSetup() {
         File f = new File("stats.xml");
         if (!f.exists()) {
             try {
                 DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
                 DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
-                document = docBuilder.newDocument();
+                Document document = docBuilder.newDocument();
 
                 Element rootElement = document.createElement("stats");
                 document.appendChild(rootElement);
 
-                initializeStatsHelper(rootElement, "beginner");
-                initializeStatsHelper(rootElement, "intermediate");
-                initializeStatsHelper(rootElement, "expert");
-                initializeStatsHelper(rootElement, "lottery");
+                initializeStatsHelper(document, rootElement, "beginner");
+                initializeStatsHelper(document, rootElement, "intermediate");
+                initializeStatsHelper(document, rootElement, "expert");
+                initializeStatsHelper(document, rootElement, "lottery");
 
                 TransformerFactory transformerFactory = TransformerFactory.newInstance();
                 Transformer transformer = transformerFactory.newTransformer();
@@ -42,8 +40,8 @@ public class StatsHelper {
         }
     }
 
-    private static void initializeStatsHelper(Element root, String difficulty) {
-        Element e = document.createElement(difficulty);
+    private static void initializeStatsHelper(Document d, Element root, String difficulty) {
+        Element e = d.createElement(difficulty);
         e.setAttribute("average", "NaN");
         e.setAttribute("best", "NaN");
         e.setAttribute("wins", "0");
@@ -56,7 +54,7 @@ public class StatsHelper {
         Map<String, String> stats = new HashMap<>();
         File f = new File("stats.xml");
         try {
-            document = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(f);
+            Document document = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(f);
             Element e = (Element) document.getElementsByTagName(difficulty).item(0);
             stats.put("average", e.getAttribute("average"));
             stats.put("best", e.getAttribute("best"));
@@ -72,7 +70,7 @@ public class StatsHelper {
     public static void winGame(String difficulty) { // update all stats for game mode
         File f = new File("stats.xml");
         try {
-            document = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(f);
+            Document document = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(f);
             Element e = (Element) document.getElementsByTagName(difficulty).item(0);
             int wins = Integer.valueOf(e.getAttribute("wins"));
             int played = Integer.valueOf(e.getAttribute("played"));
@@ -94,7 +92,7 @@ public class StatsHelper {
         File f = new File("stats.xml");
         if (f.exists()) {
             try {
-                document = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(f);
+                Document document = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(f);
                 Element e = (Element) document.getElementsByTagName(mode).item(0);
                 e.setAttribute("average", "NaN");
                 e.setAttribute("best", "NaN");
