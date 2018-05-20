@@ -1,6 +1,4 @@
 # meinsweeper
 Mein very own Minesweeper clone :)
 
-Upcoming features:
-
--Stats and Settings (choose from 4 difficulties)
+Choose from 4 difficulties, including my very own "Lottery" mode! (It's exactly what you think haha)
