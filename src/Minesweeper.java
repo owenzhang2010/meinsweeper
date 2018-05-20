@@ -12,6 +12,7 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
+import java.util.Map;
 import java.util.Random;
 
 public class Minesweeper extends Application {
@@ -23,9 +24,8 @@ public class Minesweeper extends Application {
     private GridPane grid;
     private AnimationTimer timer;
     private Text timerText, faceText, minesText;
-    private int numMines = 2, boardHeight = 16, boardWidth = 16;
-    private int gameState; // in progress = 0, lost = -1, won = 1
-    // TODO: make above an enum or something
+    private int numMines, boardHeight, boardWidth;
+    private int gameState;
     // TODO: let 'em set their own difficulty already for chrissake!
     // TODO: 2d-array of image views so finding a flag ain't so damn hard
     // TODO: break into board and tile classes so you don't have 23058943702543 instance vars
@@ -46,6 +46,10 @@ public class Minesweeper extends Application {
     private void initialize() {
         StatsHelper.xmlSetup();
 
+        Map<String, Integer> settings = SettingsHelper.getSettings();
+        numMines = settings.get("mines");
+        boardHeight = settings.get("height");
+        boardWidth = settings.get("width");
         container = new BorderPane();
         gameContainer = new BorderPane();
         grid = new GridPane();
