@@ -83,11 +83,11 @@ public class StatsHelper {
             best = (Double.isNaN(best)) ? time : (time < best) ? time : best;
             wins += 1; played += 1;
             double percentage = ((double) wins) / ((double) played);
-            e.setAttribute("average", Double.toString(round(average, 2)));
-            e.setAttribute("best", Double.toString(round(best, 2)));
+            e.setAttribute("average", Double.toString(round(average)));
+            e.setAttribute("best", Double.toString(round(best)));
             e.setAttribute("wins", Integer.toString(wins));
             e.setAttribute("played", Integer.toString(played));
-            e.setAttribute("percentage", Double.toString(round(percentage * 100, 2)));
+            e.setAttribute("percentage", Double.toString(round(percentage * 100)));
 
             Transformer transformer = TransformerFactory.newInstance().newTransformer();
             DOMSource source = new DOMSource(document);
@@ -108,7 +108,7 @@ public class StatsHelper {
             played += 1;
             double percentage = ((double) wins) / ((double) played);
             e.setAttribute("played", Integer.toString(played));
-            e.setAttribute("percentage", Double.toString(round(percentage * 100, 2)));
+            e.setAttribute("percentage", Double.toString(round(percentage * 100)));
 
             Transformer transformer = TransformerFactory.newInstance().newTransformer();
             DOMSource source = new DOMSource(document);
@@ -148,11 +148,9 @@ public class StatsHelper {
         resetMode("lottery");
     }
 
-    private static double round(double value, int places) {
-        if (places < 0) throw new IllegalArgumentException();
-
+    private static double round(double value) {
         BigDecimal bd = new BigDecimal(value);
-        bd = bd.setScale(places, RoundingMode.HALF_UP);
+        bd = bd.setScale(2, RoundingMode.HALF_UP);
         return bd.doubleValue();
     }
 }
