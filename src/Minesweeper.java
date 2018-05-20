@@ -61,7 +61,7 @@ public class Minesweeper extends Application {
         numRemainingMines = numMines;
         gameState = 0;
         elapsedTime = 0; startNanos = 0;
-        timer = new AnimationTimer() {
+        timer = new AnimationTimer() { // TODO: fix bug: timer restarting immediately when changing difficulty
             @Override
             public void handle(long now) {
                 if (startNanos == 0) {
@@ -104,8 +104,27 @@ public class Minesweeper extends Application {
         });
         gameMenu.getItems().addAll(newGame, exit);
 
-        MenuItem settings = new MenuItem("Settings");
-        settingsMenu.getItems().addAll(settings);
+        MenuItem sBeginner = new MenuItem("Beginner");
+        sBeginner.setOnAction(e -> {
+            SettingsHelper.setDifficulty("beginner");
+            restart();
+        });
+        MenuItem sIntermediate = new MenuItem("Intermediate");
+        sIntermediate.setOnAction(e -> {
+            SettingsHelper.setDifficulty("intermediate");
+            restart();
+        });
+        MenuItem sExpert = new MenuItem("Expert");
+        sExpert.setOnAction(e -> {
+            SettingsHelper.setDifficulty("expert");
+            restart();
+        });
+        MenuItem sLottery = new MenuItem("Lottery");
+        sLottery.setOnAction(e -> {
+            SettingsHelper.setDifficulty("lottery");
+            restart();
+        });
+        settingsMenu.getItems().addAll(sBeginner, sIntermediate, sExpert, sLottery);
 
         MenuItem beginner = new MenuItem("Beginner");
         beginner.setOnAction(e -> StatsHelper.showStats("beginner"));
@@ -306,6 +325,7 @@ public class Minesweeper extends Application {
     }
 
     private void restart() {
+        timer.stop();
         initialize();
     }
 

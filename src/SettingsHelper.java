@@ -2,6 +2,10 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
 import java.io.File;
 
 import java.util.Map;
@@ -13,7 +17,11 @@ public class SettingsHelper {
         try {
             Document document = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(f);
             Element e = (Element) document.getElementsByTagName("difficulty").item(0);
-            e.setNodeValue(difficulty);
+            e.setTextContent(difficulty);
+            Transformer transformer = TransformerFactory.newInstance().newTransformer();
+            DOMSource source = new DOMSource(document);
+            StreamResult result = new StreamResult(f);
+            transformer.transform(source, result);
         } catch (Exception e) {
             e.printStackTrace();
         }

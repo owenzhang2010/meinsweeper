@@ -1,7 +1,7 @@
-<settings>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><settings>
     <difficulty>beginner</difficulty>
-    <beginner mines="10" width="8" height="8"/>
-    <intermediate mines="40" width="16" height="16"/>
-    <expert mines="99" width="30" height="16"/>
-    <lottery mines="479" width="30" height="16"/>
+    <beginner height="8" mines="10" width="8"/>
+    <intermediate height="16" mines="40" width="16"/>
+    <expert height="16" mines="99" width="30"/>
+    <lottery height="16" mines="479" width="30"/>
 </settings>
