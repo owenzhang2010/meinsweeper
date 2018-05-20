@@ -16,11 +16,14 @@ public class StatsBox {
         String text = "Average time: " + stats.get("average") + "\n"
                     + "Best time: " + stats.get("best") + "\n"
                     + "Wins: " + stats.get("wins") + "\n"
-                    + "Gamed played: " + stats.get("played") + "\n"
+                    + "Games played: " + stats.get("played") + "\n"
                     + "Win percentage: " + stats.get("percentage") + "\n";
         Text t = new Text(text);
         Button reset = new Button("Reset");
-        reset.setOnAction(event -> StatsHelper.resetMode(difficulty));
+        reset.setOnAction(event -> {
+            StatsHelper.resetMode(difficulty);
+            window.close();
+        });
 
         VBox v = new VBox();
         v.getChildren().addAll(t, reset);

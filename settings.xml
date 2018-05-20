@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?><settings>
-    <difficulty>beginner</difficulty>
+    <difficulty>intermediate</difficulty>
     <beginner height="8" mines="10" width="8"/>
     <intermediate height="16" mines="40" width="16"/>
     <expert height="16" mines="99" width="30"/>

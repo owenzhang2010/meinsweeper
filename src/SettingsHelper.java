@@ -12,6 +12,17 @@ import java.util.Map;
 import java.util.HashMap;
 
 public class SettingsHelper {
+    public static String getDifficulty() {
+        File f = new File("settings.xml");
+        try {
+            Document document = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(f);
+            return document.getElementsByTagName("difficulty").item(0).getTextContent();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
     public static void setDifficulty(String difficulty) {
         File f = new File("settings.xml");
         try {

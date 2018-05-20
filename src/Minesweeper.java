@@ -26,7 +26,6 @@ public class Minesweeper extends Application {
     private Text timerText, faceText, minesText;
     private int numMines, boardHeight, boardWidth;
     private int gameState;
-    // TODO: let 'em set their own difficulty already for chrissake!
     // TODO: 2d-array of image views so finding a flag ain't so damn hard
     // TODO: break into board and tile classes so you don't have 23058943702543 instance vars
 
@@ -61,7 +60,7 @@ public class Minesweeper extends Application {
         numRemainingMines = numMines;
         gameState = 0;
         elapsedTime = 0; startNanos = 0;
-        timer = new AnimationTimer() { // TODO: fix bug: timer restarting immediately when changing difficulty
+        timer = new AnimationTimer() {
             @Override
             public void handle(long now) {
                 if (startNanos == 0) {
@@ -140,9 +139,9 @@ public class Minesweeper extends Application {
             alert.setTitle("woah there");
             alert.showAndWait();
             if (alert.getResult() == ButtonType.YES) {
+                StatsHelper.resetAll();
                 restart();
             }
-            StatsHelper.resetAll();
         });
         statsMenu.getItems().addAll(beginner, intermediate, expert, lottery, resetAll);
 
@@ -342,6 +341,7 @@ public class Minesweeper extends Application {
             }
         }
         minesText.setText("0");
+        StatsHelper.winGame(SettingsHelper.getDifficulty(), elapsedTime);
 
         popup("congrats", "You win! Play again?");
     }
@@ -362,6 +362,7 @@ public class Minesweeper extends Application {
                 }
             }
         }
+        StatsHelper.loseGame(SettingsHelper.getDifficulty());
         popup("u lose", "R I P Play again?");
     }
 
