@@ -2,9 +2,10 @@ import java.util.Map;
 
 import javafx.stage.Stage;
 import javafx.stage.Modality;
+import javafx.scene.control.Button;
 import javafx.scene.text.Text;
 import javafx.scene.Scene;
-import javafx.scene.layout.GridPane;
+import javafx.scene.layout.VBox;
 
 public class StatsBox {
     public static void display(String difficulty, Map<String, String> stats) {
@@ -18,10 +19,12 @@ public class StatsBox {
                     + "Gamed played: " + stats.get("played") + "\n"
                     + "Win percentage: " + stats.get("percentage") + "\n";
         Text t = new Text(text);
+        Button reset = new Button("Reset");
+        reset.setOnAction(event -> StatsHelper.resetMode(difficulty));
 
-        GridPane g = new GridPane();
-        g.getChildren().add(t);
-        Scene scene = new Scene(g, 150, 150);
+        VBox v = new VBox();
+        v.getChildren().addAll(t, reset);
+        Scene scene = new Scene(v, 150, 150);
         window.setScene(scene);
         window.show();
     }

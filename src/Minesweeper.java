@@ -23,7 +23,12 @@ public class Minesweeper extends Application {
     private GridPane grid;
     private AnimationTimer timer;
     private Text timerText, faceText, minesText;
-    private int numMines = 40, boardHeight = 16, boardWidth = 16;
+    private int numMines = 2, boardHeight = 16, boardWidth = 16;
+    private int gameState; // in progress = 0, lost = -1, won = 1
+    // TODO: make above an enum or something
+    // TODO: let 'em set their own difficulty already for chrissake!
+    // TODO: 2d-array of image views so finding a flag ain't so damn hard
+    // TODO: break into board and tile classes so you don't have 23058943702543 instance vars
 
     public static void main(String[] args) {
         launch();
@@ -39,7 +44,6 @@ public class Minesweeper extends Application {
     }
 
     private void initialize() {
-        validateSettings();
         StatsHelper.xmlSetup();
 
         container = new BorderPane();
@@ -51,6 +55,7 @@ public class Minesweeper extends Application {
         questioned = new boolean[boardHeight][boardWidth];
         numRemainingTiles = boardHeight * boardWidth - numMines;
         numRemainingMines = numMines;
+        gameState = 0;
         elapsedTime = 0; startNanos = 0;
         timer = new AnimationTimer() {
             @Override
@@ -107,7 +112,15 @@ public class Minesweeper extends Application {
         MenuItem lottery = new MenuItem("Lottery");
         lottery.setOnAction(e -> StatsHelper.showStats("lottery"));
         MenuItem resetAll = new MenuItem("Reset All");
-        resetAll.setOnAction(e -> StatsHelper.resetAll());
+        resetAll.setOnAction(e -> {
+            Alert alert = new Alert(Alert.AlertType.CONFIRMATION, "Are you sure?", ButtonType.YES, ButtonType.CLOSE);
+            alert.setTitle("woah there");
+            alert.showAndWait();
+            if (alert.getResult() == ButtonType.YES) {
+                restart();
+            }
+            StatsHelper.resetAll();
+        });
         statsMenu.getItems().addAll(beginner, intermediate, expert, lottery, resetAll);
 
         mb.getMenus().addAll(gameMenu, settingsMenu, statsMenu);
@@ -116,7 +129,7 @@ public class Minesweeper extends Application {
 
     private void initializeGameHUD() {
 
-        timerText = new Text(Double.toString(elapsedTime));
+        timerText = new Text("0");
         faceText = new Text(":-)");
         minesText = new Text(Integer.toString(numRemainingMines));
         Region region1 = new Region();
@@ -158,12 +171,6 @@ public class Minesweeper extends Application {
         container.setCenter(gameContainer);
     }
 
-    private void validateSettings() {
-        if (boardHeight * boardWidth <= numMines) {
-            throw new IllegalStateException("invalid game settings");
-        }
-    }
-
     private void placeMines() {
         int i = 0;
         Random r = new Random();
@@ -189,6 +196,11 @@ public class Minesweeper extends Application {
         } else {
             uncoverTile(tile, row, col);
         }
+        if (gameState == 1) {
+            win();
+        } else if (gameState == -1) {
+            lose();
+        }
     }
 
     private void secondaryClick(ImageView tile) {
@@ -203,7 +215,7 @@ public class Minesweeper extends Application {
         uncovered[row][col] = true;
         numRemainingTiles -= 1;
         if (mined[row][col]) {
-            lose();
+            gameState = -1;
         } else {
             int neighboringMines = getNeighboringMines(row, col);
             tile.setImage(new Image("File:assets/32px-Minesweeper_" + neighboringMines + ".svg.png"));
@@ -211,7 +223,7 @@ public class Minesweeper extends Application {
                 uncoverUnflaggedNeighbors(row, col);
             }
             if (numRemainingTiles == 0) {
-                win();
+                gameState = 1;
             }
         }
     }
